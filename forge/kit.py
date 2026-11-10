@@ -3,6 +3,7 @@ one-image previews, and a ready-made character to customise."""
 import numpy as np
 
 from . import post
+from .humanoid import humanoid  # noqa: F401  (kit.humanoid: bare mannequin base)
 from .render import Camera, render, turnaround
 from .sdf import (Scene, align_y, box, capsule, cylinder, ellipsoid, intersect, lerp,
                   plane, rx, ry, rz, sphere, subtract, torus, union)
