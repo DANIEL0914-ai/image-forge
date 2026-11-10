@@ -524,6 +524,7 @@ class Material:
         self.name = name
         self.color = to_linear(color)
         self.metallic, self.rough = float(metallic), float(rough)
+        self.emit, self._own_emit_color = float(emit), emit_color is None
         ec = self.color if emit_color is None else to_linear(emit_color)
         self.emissive = tuple(c * float(emit) for c in ec)
         self.coat, self.coat_rough, self.spec = float(coat), float(coat_rough), float(spec)
@@ -531,6 +532,13 @@ class Material:
         self.rough_var, self.albedo_var, self.var_scale = float(rough_var), float(albedo_var), float(var_scale)
         self.pattern, self.pattern_scale = pattern, float(pattern_scale)
         self.pattern_strength = float(pattern_strength)
+
+    def recolor(self, color):
+        """Change the base colour (and the glow colour, if it followed the base)."""
+        self.color = to_linear(color)
+        if self._own_emit_color:
+            self.emissive = tuple(c * self.emit for c in self.color)
+        return self
 
     @property
     def procedural(self):
@@ -566,6 +574,24 @@ class Scene:
         self.parts.append(Part(name, node, material, mirror, group))
         self._groups = None
         return self
+
+    def remove(self, *names):
+        """Drop parts by name (a trailing * matches a prefix, e.g. 'pack*')."""
+        def hit(n):
+            return any(n == k or (k.endswith("*") and n.startswith(k[:-1])) for k in names)
+        self.parts = [p for p in self.parts if not hit(p.name)]
+        self._groups = None
+        return self
+
+    def recolor(self, **colors):
+        """scene.recolor(plate="#8a2f2f", glow="#ffb000")"""
+        for name, color in colors.items():
+            self.materials[name].recolor(color)
+        self._groups = None
+        return self
+
+    def part_names(self):
+        return [p.name for p in self.parts]
 
     def _build(self):
         names = list(self.materials)
