@@ -1,0 +1,8 @@
+# image-forge
+
+Rendering engine for the image-forge Claude skill: pixel sprites, 2D art and SDF 3D renders from code (16 px to 4K).
+
+- `forge/` - the Python package (needs numpy, pillow, scipy)
+- `selftest.py` - quick check of all three modes (writes test.png)
+- `examples/soldier_turnaround.py` - 4K character turnaround
+- `docs/modeling.md` - how to model characters and props well
